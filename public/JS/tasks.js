@@ -32,18 +32,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
   //Details the tasks
   document.addEventListener('click', (event) => {
-    if(event.target.closest('.detail-task-button'))
-      {
-        const title = event.target.closest('.task')?.querySelector('.title');
+  const confirmBtn = event.target.closest('.detail-task-button');
+  if (!confirmBtn) return;
 
-        if(!title) return;
+  const task = confirmBtn.closest('.task');
+  if (!task) return;
 
-        title.innerHTML = `<input type="text" class="form-control" placeholder="title">`
-        event.target.closest('.detail-task-button').textContent = 'Confirm';
+  const title = task.querySelector('.title');
+  const subtitle = task.querySelector('.subtitle');
+  if (!title && !subtitle) return;
 
-        if(title.querySelector('input')) return;
-      };
-  })
+  // Prevent recreating input
+  if (!title.querySelector('input')) {
+    const currentTitle = title.textContent.trim();
+    const currentSubtitle = subtitle.textContent.trim();
+
+    title.innerHTML = `
+      <input type="text" class="form-control" value="${currentTitle}">
+    `;
+    subtitle.innerHTML = `
+      <input type="text" class="form-control" value="${currentSubtitle}">
+    `
+    confirmBtn.textContent = 'Confirm';
+    return;
+  }
+
+  // CONFIRM MODE
+  const titleInput = title.querySelector('input');
+  const newTitle = titleInput.value.trim();
+  const subTitleInput = subtitle.querySelector('input');
+  const newSubTitle = subTitleInput.value.trim();
+
+  title.textContent = newTitle || 'Untitled';
+  subtitle.textContent = newSubTitle || 'no description';
+  confirmBtn.textContent = 'Edit';
+
+  localStorage.setItem('title', newTitle);
+  localStorage.setItem('subtitle', subtitle?.textContent || '');
+});
+
 
 
   //deletes the task
